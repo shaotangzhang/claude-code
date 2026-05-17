@@ -1,0 +1,43 @@
+{
+    "name": "acme/user-center",
+    "description": "Front-of-site user account area: profile, password, security, sessions.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/contracts": "*",
+        "acme/support": "*",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\UserCenter\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Acme\\UserCenter\\UserCenterServiceProvider"
+            ]
+        },
+        "acme": {
+            "module": {
+                "key": "user-center",
+                "title": "Acme User Center",
+                "version": "0.1.0",
+                "layer": 1,
+                "depends": ["auth"]
+            }
+        }
+    }
+}

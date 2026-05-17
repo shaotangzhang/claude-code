@@ -7,16 +7,17 @@ on:
     branches: [main]
 
 jobs:
-  test-starter:
-    name: starter (php ${{ matrix.php }})
+  test:
+    name: ${{ matrix.package }} (php ${{ matrix.php }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         php: ["8.3", "8.4"]
+        package: ["starter", "rbac", "admin"]
     defaults:
       run:
-        working-directory: packages/starter
+        working-directory: packages/${{ matrix.package }}
     steps:
       - uses: actions/checkout@v4
 

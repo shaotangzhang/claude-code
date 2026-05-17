@@ -1,0 +1,54 @@
+{
+    "name": "acme/admin",
+    "description": "Administrative back-office shell. Provides the navigation aggregator, layout, and a dashboard skeleton.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/contracts": "*",
+        "acme/support": "*",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "acme/rbac": "*",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Admin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\Admin\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Acme\\Admin\\AdminServiceProvider"
+            ]
+        },
+        "acme": {
+            "module": {
+                "key": "admin",
+                "title": "Acme Admin Shell",
+                "version": "0.1.0",
+                "layer": 1,
+                "depends": ["rbac"]
+            }
+        }
+    }
+}

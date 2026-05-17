@@ -1,18 +1,21 @@
 {
-    "name": "acme/starter",
-    "description": "Foundation for all acme/* packages. Provides module manifest loader, installer, base ServiceProvider, baseline middleware and CLI.",
+    "name": "acme/auth",
+    "description": "User identity, authentication, registration, password reset, 2FA & SSO scaffolding.",
     "type": "library",
     "license": "MIT",
-    "version": "0.2.0",
+    "version": "0.1.0",
     "repositories": [
         { "type": "path", "url": "../contracts", "options": { "symlink": true } },
-        { "type": "path", "url": "../support",   "options": { "symlink": true } }
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } }
     ],
     "require": {
         "php": "^8.3",
         "acme/contracts": "*",
         "acme/support": "*",
-        "illuminate/console": "^12.0",
+        "acme/starter": "*",
+        "illuminate/auth": "^12.0",
+        "illuminate/database": "^12.0",
         "illuminate/support": "^12.0"
     },
     "require-dev": {
@@ -21,27 +24,27 @@
     },
     "autoload": {
         "psr-4": {
-            "Acme\\Starter\\": "src/"
+            "Acme\\Auth\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Acme\\Starter\\Tests\\": "tests/"
+            "Acme\\Auth\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Acme\\Starter\\StarterServiceProvider"
+                "Acme\\Auth\\AuthServiceProvider"
             ]
         },
         "acme": {
             "module": {
-                "key": "starter",
-                "title": "Acme Starter",
+                "key": "auth",
+                "title": "Acme Auth",
                 "version": "0.1.0",
-                "layer": 0,
-                "depends": ["contracts", "support"]
+                "layer": 1,
+                "depends": ["starter"]
             }
         }
     }

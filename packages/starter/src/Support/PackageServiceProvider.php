@@ -19,13 +19,15 @@ abstract class PackageServiceProvider extends ServiceProvider
     /** Absolute path to the package root. */
     protected string $root;
 
-    protected bool $hasConfig     = true;
-    protected bool $hasMigrations = true;
-    protected bool $hasViews      = false;
-    protected bool $hasLang       = false;
-    protected bool $hasRoutesWeb  = false;
-    protected bool $hasRoutesAdmin = false;
-    protected bool $hasRoutesApi  = false;
+    protected bool $hasConfig       = true;
+    protected bool $hasMigrations   = true;
+    protected bool $hasViews        = false;
+    protected bool $hasLang         = false;
+    protected bool $hasRoutesWeb    = false;
+    protected bool $hasRoutesAdmin  = false;
+    protected bool $hasRoutesApi    = false;
+    protected bool $hasCapabilities = false;
+    protected bool $hasNavigation   = false;
 
     public function register(): void
     {
@@ -63,7 +65,42 @@ abstract class PackageServiceProvider extends ServiceProvider
             $this->registerPublishables();
         }
 
+        $this->registerCapabilities();
+        $this->registerNavigation();
+
         $this->packageBoot();
+    }
+
+    protected function registerCapabilities(): void
+    {
+        if (! $this->hasCapabilities) {
+            return;
+        }
+        $file = "{$this->root}/src/capabilities.php";
+        if (! is_file($file)) {
+            return;
+        }
+        $contract = \Acme\Contracts\Module\CapabilityRegistry::class;
+        if (! $this->app->bound($contract)) {
+            return; // rbac not installed yet; harmless no-op
+        }
+        $this->app->make($contract)->registerMany(require $file);
+    }
+
+    protected function registerNavigation(): void
+    {
+        if (! $this->hasNavigation) {
+            return;
+        }
+        $file = "{$this->root}/src/navigation.php";
+        if (! is_file($file)) {
+            return;
+        }
+        $contract = \Acme\Contracts\Module\NavigationRegistry::class;
+        if (! $this->app->bound($contract)) {
+            return; // admin not installed yet
+        }
+        $this->app->make($contract)->registerMany(require $file);
     }
 
     protected function registerPublishables(): void

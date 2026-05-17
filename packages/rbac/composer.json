@@ -1,0 +1,53 @@
+{
+    "name": "acme/rbac",
+    "description": "Role-based access control. Capability registry, roles/permissions, automatic Gate registration.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/contracts": "*",
+        "acme/support": "*",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "illuminate/auth": "^12.0",
+        "illuminate/database": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Rbac\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\Rbac\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Acme\\Rbac\\RbacServiceProvider"
+            ]
+        },
+        "acme": {
+            "module": {
+                "key": "rbac",
+                "title": "Acme RBAC",
+                "version": "0.1.0",
+                "layer": 1,
+                "depends": ["auth"]
+            }
+        }
+    }
+}
