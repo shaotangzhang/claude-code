@@ -1,0 +1,56 @@
+{
+    "name": "acme/catalog",
+    "description": "Product catalog: products, categories, brands, SKU variants, prices. Display-only (no cart).",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
+        { "type": "path", "url": "../media",     "options": { "symlink": true } },
+        { "type": "path", "url": "../cms-core",  "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "acme/rbac": "*",
+        "acme/media": "*",
+        "acme/cms-core": "*",
+        "illuminate/database": "^12.0",
+        "illuminate/routing": "^12.0",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Catalog\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\Catalog\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": ["Acme\\Catalog\\CatalogServiceProvider"]
+        },
+        "acme": {
+            "module": {
+                "key": "catalog",
+                "title": "Acme Catalog",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["cms-core", "media"]
+            }
+        }
+    }
+}
