@@ -13,9 +13,10 @@ namespace Acme\Contracts\Commerce;
  */
 final readonly class CartAdjustment
 {
-    public const TARGET_DISCOUNT = 'discount';
-    public const TARGET_SHIPPING = 'shipping';
-    public const TARGET_TAX      = 'tax';
+    public const TARGET_DISCOUNT      = 'discount';
+    public const TARGET_SHIPPING      = 'shipping';
+    public const TARGET_TAX           = 'tax';
+    public const TARGET_SHIPPING_FREE = 'shipping_free'; // amount ignored; zeroes shipping
 
     public function __construct(
         public string $sourceKey,

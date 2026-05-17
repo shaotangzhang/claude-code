@@ -1,9 +1,9 @@
 {
-    "name": "acme/cart",
-    "description": "Shopping cart: guest/user carts with merge-on-login, coupon engine, pluggable tax & shipping strategies, plus CartAdjustmentProvider extension point.",
+    "name": "acme/loyalty-redemption",
+    "description": "Redeem loyalty points as a cart discount. Plugs into cart's AdjustmentRegistry; debits points on OrderPaid.",
     "type": "library",
     "license": "MIT",
-    "version": "0.4.0",
+    "version": "0.1.0",
     "repositories": [
         { "type": "path", "url": "../contracts", "options": { "symlink": true } },
         { "type": "path", "url": "../support",   "options": { "symlink": true } },
@@ -12,21 +12,23 @@
         { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
         { "type": "path", "url": "../media",     "options": { "symlink": true } },
         { "type": "path", "url": "../cms-core",  "options": { "symlink": true } },
-        { "type": "path", "url": "../catalog",   "options": { "symlink": true } }
+        { "type": "path", "url": "../catalog",   "options": { "symlink": true } },
+        { "type": "path", "url": "../cart",      "options": { "symlink": true } },
+        { "type": "path", "url": "../membership","options": { "symlink": true } },
+        { "type": "path", "url": "../payments",  "options": { "symlink": true } },
+        { "type": "path", "url": "../checkout",  "options": { "symlink": true } },
+        { "type": "path", "url": "../commerce",  "options": { "symlink": true } }
     ],
     "require": {
         "php": "^8.3",
         "acme/starter": "*",
-        "acme/auth": "*",
-        "acme/rbac": "*",
-        "acme/cms-core": "*",
-        "acme/catalog": "*",
-        "illuminate/database": "^12.0",
+        "acme/cart": "*",
+        "acme/checkout": "*",
+        "acme/commerce": "*",
         "illuminate/events": "^12.0",
         "illuminate/http": "^12.0",
         "illuminate/routing": "^12.0",
-        "illuminate/support": "^12.0",
-        "illuminate/view": "^12.0"
+        "illuminate/support": "^12.0"
     },
     "require-dev": {
         "orchestra/testbench": "^10.0",
@@ -34,25 +36,25 @@
     },
     "autoload": {
         "psr-4": {
-            "Acme\\Cart\\": "src/"
+            "Acme\\LoyaltyRedemption\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Acme\\Cart\\Tests\\": "tests/"
+            "Acme\\LoyaltyRedemption\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
-            "providers": ["Acme\\Cart\\CartServiceProvider"]
+            "providers": ["Acme\\LoyaltyRedemption\\LoyaltyRedemptionServiceProvider"]
         },
         "acme": {
             "module": {
-                "key": "cart",
-                "title": "Acme Cart",
+                "key": "loyalty-redemption",
+                "title": "Acme Loyalty · Redemption",
                 "version": "0.1.0",
                 "layer": 3,
-                "depends": ["catalog"]
+                "depends": ["cart", "commerce", "checkout"]
             }
         }
     }

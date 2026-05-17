@@ -56,6 +56,7 @@ final class TotalsCalculator
 
         $extraDiscount = 0;
         $extraShipping = 0;
+        $forceFreeShipping = false;
         foreach ($this->adjustments->all() as $provider) {
             foreach ($provider->adjustmentsFor($providerItems, $subtotal, $cart->currency, $cart->user_id) as $adj) {
                 /** @var CartAdjustment $adj */
@@ -64,6 +65,8 @@ final class TotalsCalculator
                     $extraDiscount += abs($adj->amountCents);
                 } elseif ($adj->target === CartAdjustment::TARGET_SHIPPING) {
                     $extraShipping += $adj->amountCents;
+                } elseif ($adj->target === CartAdjustment::TARGET_SHIPPING_FREE) {
+                    $forceFreeShipping = true;
                 }
             }
         }
@@ -83,6 +86,9 @@ final class TotalsCalculator
             $shippingCents = $chosen->costCents;
         }
         $shippingCents = max(0, $shippingCents + $extraShipping);
+        if ($forceFreeShipping) {
+            $shippingCents = 0;
+        }
 
         $cart->subtotal_cents = $subtotal;
         $cart->discount_cents = $discount;

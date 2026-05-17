@@ -10,6 +10,8 @@ use Acme\Checkout\Events\OrderFulfilled;
 use Acme\Checkout\Events\OrderPaid;
 use Acme\Commerce\Campaigns\CampaignProvider;
 use Acme\Commerce\Campaigns\Evaluators\BundleEvaluator;
+use Acme\Commerce\Campaigns\Evaluators\BxgyEvaluator;
+use Acme\Commerce\Campaigns\Evaluators\FreebieEvaluator;
 use Acme\Commerce\Campaigns\Evaluators\TimedDiscountEvaluator;
 use Acme\Commerce\Campaigns\RuleEvaluator;
 use Acme\Commerce\Listeners\HandleOrderCanceled;
@@ -47,6 +49,8 @@ final class CommerceServiceProvider extends PackageServiceProvider
         $this->app->tag([
             BundleEvaluator::class,
             TimedDiscountEvaluator::class,
+            BxgyEvaluator::class,
+            FreebieEvaluator::class,
         ], 'acme.commerce.campaign_evaluators');
 
         $this->app->singleton(CampaignProvider::class, function ($app) {

@@ -10,6 +10,7 @@ use Acme\Cart\Events\ItemUpdated;
 use Acme\Cart\Models\Cart;
 use Acme\Cart\Models\CartItem;
 use Acme\Catalog\Models\Sku;
+use Acme\Contracts\Commerce\PriceResolver;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ final class CartService
     public function __construct(
         private readonly Dispatcher $events,
         private readonly TotalsCalculator $totals,
+        private readonly PriceResolver $prices,
     ) {}
 
     public function findOrCreate(?string $userId, ?string $guestToken, string $currency, string $locale = 'en'): Cart
@@ -56,10 +58,20 @@ final class CartService
 
     public function addItem(Cart $cart, Sku $sku, int $quantity = 1, array $attrs = []): CartItem
     {
-        $this->guardCurrency($cart, $sku);
         $this->guardQuantity($quantity);
 
-        return DB::transaction(function () use ($cart, $sku, $quantity, $attrs): CartItem {
+        // Resolve unit price for the cart's currency via PriceResolver.
+        // Default impl falls back to SKU.price_cents only when the SKU's
+        // own currency matches; multi-currency-pricing overrides to look
+        // up a price-book row for any supported currency.
+        $unitCents = $this->prices->priceFor($sku->id, $cart->currency);
+        if ($unitCents === null) {
+            throw new RuntimeException(
+                "No price for SKU {$sku->id} in {$cart->currency}. Configure a price book entry or use a SKU priced in this currency.",
+            );
+        }
+
+        return DB::transaction(function () use ($cart, $sku, $quantity, $attrs, $unitCents): CartItem {
             $item = CartItem::query()->where('cart_id', $cart->id)->where('sku_id', $sku->id)->first();
             if ($item) {
                 $item->quantity         = min($item->quantity + $quantity, (int) config('acme.cart.max_quantity_per_line', 999));
@@ -70,9 +82,9 @@ final class CartService
                     'cart_id'          => $cart->id,
                     'sku_id'           => $sku->id,
                     'quantity'         => $quantity,
-                    'unit_price_cents' => $sku->price_cents,
-                    'line_total_cents' => $sku->price_cents * $quantity,
-                    'currency'         => $sku->currency,
+                    'unit_price_cents' => $unitCents,
+                    'line_total_cents' => $unitCents * $quantity,
+                    'currency'         => $cart->currency,
                     'attrs_json'       => $attrs ?: null,
                 ]);
             }
@@ -123,15 +135,6 @@ final class CartService
     {
         $cart->status = Cart::STATUS_CONVERTED;
         $cart->save();
-    }
-
-    private function guardCurrency(Cart $cart, Sku $sku): void
-    {
-        if ($sku->currency !== $cart->currency) {
-            throw new RuntimeException(
-                "Currency mismatch: cart={$cart->currency}, sku={$sku->currency}. Start a new cart for that currency.",
-            );
-        }
     }
 
     private function guardQuantity(int $q): void
