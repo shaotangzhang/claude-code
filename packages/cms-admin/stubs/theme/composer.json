@@ -1,0 +1,27 @@
+{
+    "name": "client/theme-{{ key }}",
+    "description": "{{ name }} theme.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "acme/cms-core": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Client\\Theme\\{{ studly }}\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": ["Client\\Theme\\{{ studly }}\\ThemeServiceProvider"]
+        },
+        "acme": {
+            "theme": {
+                "key": "{{ key }}",
+                "name": "{{ name }}",
+                "version": "0.1.0"
+            }
+        }
+    }
+}

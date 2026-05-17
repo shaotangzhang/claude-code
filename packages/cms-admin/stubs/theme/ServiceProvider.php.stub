@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Client\Theme\{{ studly }};
+
+use Acme\Contracts\Cms\ThemeManifest;
+use Acme\Contracts\Cms\ThemeRegistry;
+use Illuminate\Support\ServiceProvider;
+
+final class ThemeServiceProvider extends ServiceProvider
+{
+    public function boot(ThemeRegistry $themes): void
+    {
+        $root = dirname(__DIR__);
+
+        $themes->register(new ThemeManifest(
+            key:       '{{ key }}',
+            name:      '{{ name }}',
+            version:   '0.1.0',
+            viewPath:  $root . '/views',
+            assetPath: $root . '/public',
+            tokens:    (array) (json_decode((string) file_get_contents($root . '/theme.json'), true)['tokens'] ?? []),
+            layouts:   ['default'],
+        ));
+
+        $this->loadViewsFrom($root . '/views', 'theme-{{ key }}');
+        $this->publishes([$root . '/public' => public_path('themes/{{ key }}')], 'theme-{{ key }}-assets');
+    }
+}

@@ -1,0 +1,57 @@
+{
+    "name": "acme/cms-admin",
+    "description": "CMS authoring: page edit / version / publish / rollback, theme activation, menus, theme scaffolding CLI.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
+        { "type": "path", "url": "../admin",     "options": { "symlink": true } },
+        { "type": "path", "url": "../cms-core",  "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "acme/rbac": "*",
+        "acme/admin": "*",
+        "acme/cms-core": "*",
+        "illuminate/console": "^12.0",
+        "illuminate/database": "^12.0",
+        "illuminate/events": "^12.0",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\CmsAdmin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\CmsAdmin\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": ["Acme\\CmsAdmin\\CmsAdminServiceProvider"]
+        },
+        "acme": {
+            "module": {
+                "key": "cms-admin",
+                "title": "Acme CMS Admin",
+                "version": "0.1.0",
+                "layer": 2,
+                "depends": ["admin", "cms-core"]
+            }
+        }
+    }
+}

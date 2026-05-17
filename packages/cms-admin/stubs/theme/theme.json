@@ -1,0 +1,10 @@
+{
+    "key": "{{ key }}",
+    "name": "{{ name }}",
+    "version": "0.1.0",
+    "tokens": {
+        "color.primary": "#0066cc",
+        "font.body": "system-ui, sans-serif"
+    },
+    "layouts": ["default"]
+}
