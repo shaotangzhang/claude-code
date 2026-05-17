@@ -8,6 +8,7 @@ use Acme\AbandonedCart\Console\TickCommand;
 use Acme\AbandonedCart\Events\CartAbandoned;
 use Acme\AbandonedCart\Listeners\SendRecoveryReminder;
 use Acme\AbandonedCart\Services\AbandonmentService;
+use Acme\AbandonedCart\Services\CouponMinter;
 use Acme\Starter\Support\PackageServiceProvider;
 use Illuminate\Contracts\Events\Dispatcher;
 
@@ -25,6 +26,7 @@ final class AbandonedCartServiceProvider extends PackageServiceProvider
 
     protected function packageRegister(): void
     {
+        $this->app->singleton(CouponMinter::class);
         $this->app->singleton(AbandonmentService::class);
     }
 

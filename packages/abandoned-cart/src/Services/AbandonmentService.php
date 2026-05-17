@@ -6,6 +6,7 @@ namespace Acme\AbandonedCart\Services;
 
 use Acme\AbandonedCart\Events\CartAbandoned;
 use Acme\AbandonedCart\Events\CartRecovered;
+use Acme\AbandonedCart\Models\AbandonedReminder;
 use Acme\Auth\Models\User;
 use Acme\Cart\Models\Cart;
 use Carbon\CarbonImmutable;
@@ -15,26 +16,25 @@ use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
- * Detects abandonment + handles recovery.
+ * Detects abandonment + drives multi-round reminders + handles recovery.
  *
- * mark()  is called by TickCommand for each eligible cart. It assigns
- *         status=abandoned, stamps abandoned_at, mints a recovery token
- *         (idempotent — re-running on the same cart re-emits with the
- *         same token unless it has been recovered).
- *
- * recover() is called by RecoveryController when a user clicks the
- *         link. It flips status back to active, clears abandoned_at,
- *         and optionally attaches the cart to the authenticated user.
- *         Refuses tokens past their TTL.
+ * mark()         flips an active cart to abandoned and runs round 1
+ *                (immediate reminder).
+ * remind()       fires a subsequent round; mints a coupon per template;
+ *                writes one AbandonedReminder audit row.
+ * recover()      flips back to active when user clicks /recover/{token}.
  */
 final class AbandonmentService
 {
-    public function __construct(private readonly Dispatcher $events) {}
+    public function __construct(
+        private readonly Dispatcher $events,
+        private readonly CouponMinter $coupons,
+    ) {}
 
     public function mark(Cart $cart): void
     {
         if ($cart->status !== Cart::STATUS_ACTIVE) {
-            return; // idempotent: already converted/merged/abandoned → skip
+            return;
         }
 
         $token = (string) ($cart->recovery_token ?? '');
@@ -50,18 +50,20 @@ final class AbandonmentService
             $cart->save();
         });
 
-        [$email, $itemCount, $totalCents] = $this->snapshot($cart);
+        $this->fireRound($cart, round: 1);
+    }
 
-        $this->events->dispatch(new CartAbandoned(
-            cartId:        $cart->id,
-            userId:        $cart->user_id,
-            email:         $email,
-            recoveryToken: $token,
-            recoveryUrl:   url(config('acme.abandoned-cart.route_prefix', 'cart') . '/recover/' . $token),
-            itemCount:     $itemCount,
-            totalCents:    $totalCents,
-            currency:      (string) $cart->currency,
-        ));
+    public function remind(Cart $cart, int $round): void
+    {
+        if ($cart->status !== Cart::STATUS_ABANDONED) {
+            return;
+        }
+        // Idempotency: skip if this round already sent.
+        if (AbandonedReminder::query()->where('cart_id', $cart->id)->where('round', $round)->exists()) {
+            return;
+        }
+
+        $this->fireRound($cart, $round);
     }
 
     public function recover(string $token, ?string $authUserId): Cart
@@ -95,6 +97,47 @@ final class AbandonmentService
         $this->events->dispatch(new CartRecovered($cart->id, $cart->user_id));
 
         return $cart;
+    }
+
+    private function fireRound(Cart $cart, int $round): void
+    {
+        $template = config("acme.abandoned-cart.rounds.{$round}");
+        if (! is_array($template)) {
+            return;
+        }
+
+        $couponRow  = null;
+        $couponCode = null;
+        if (is_array($template['coupon'] ?? null)) {
+            $couponRow  = $this->coupons->mint((string) $cart->currency, $template['coupon']);
+            $couponCode = $couponRow->code;
+        }
+
+        DB::transaction(function () use ($cart, $round, $couponRow): void {
+            AbandonedReminder::create([
+                'cart_id'   => $cart->id,
+                'round'     => $round,
+                'coupon_id' => $couponRow?->id,
+                'sent_at'   => CarbonImmutable::now(),
+            ]);
+            $cart->reminded_at = CarbonImmutable::now();
+            $cart->save();
+        });
+
+        [$email, $itemCount, $totalCents] = $this->snapshot($cart);
+
+        $this->events->dispatch(new CartAbandoned(
+            cartId:        $cart->id,
+            userId:        $cart->user_id,
+            email:         $email,
+            recoveryToken: (string) $cart->recovery_token,
+            recoveryUrl:   url(config('acme.abandoned-cart.route_prefix', 'cart') . '/recover/' . $cart->recovery_token),
+            itemCount:     $itemCount,
+            totalCents:    $totalCents,
+            currency:      (string) $cart->currency,
+            round:         $round,
+            couponCode:    $couponCode,
+        ));
     }
 
     /** @return array{0:?string,1:int,2:int} */

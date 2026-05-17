@@ -21,7 +21,7 @@ use RuntimeException;
  * Pick strategy is naïve: first warehouse with capacity. Replace by
  * binding a different StockService implementation in your host SP.
  */
-final class StockService
+class StockService implements \Acme\Contracts\Commerce\StockAllocator
 {
     public function __construct(private readonly Dispatcher $events) {}
 

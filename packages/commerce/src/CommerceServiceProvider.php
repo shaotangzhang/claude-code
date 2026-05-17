@@ -44,6 +44,7 @@ final class CommerceServiceProvider extends PackageServiceProvider
     protected function packageRegister(): void
     {
         $this->app->singleton(StockService::class);
+        $this->app->singleton(\Acme\Contracts\Commerce\StockAllocator::class, StockService::class);
         $this->app->singleton(LoyaltyService::class);
         $this->app->singleton(ReturnService::class);
         $this->app->singleton(ReviewService::class);

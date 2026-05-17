@@ -7,7 +7,7 @@ namespace Acme\Commerce\Listeners;
 use Acme\Checkout\Events\OrderPaid;
 use Acme\Checkout\Models\Order;
 use Acme\Commerce\Services\LoyaltyService;
-use Acme\Commerce\Services\StockService;
+use Acme\Contracts\Commerce\StockAllocator;
 
 /**
  * Reserve stock + award loyalty points when an order is paid.
@@ -19,7 +19,7 @@ use Acme\Commerce\Services\StockService;
 final class HandleOrderPaid
 {
     public function __construct(
-        private readonly StockService $stock,
+        private readonly StockAllocator $stock,
         private readonly LoyaltyService $loyalty,
     ) {}
 

@@ -3,26 +3,57 @@
 declare(strict_types=1);
 
 return [
-    // Inactivity threshold (hours) after which a non-empty active cart
-    // is considered abandoned.
+    // Inactivity threshold (hours) after which an active cart is first
+    // marked abandoned.
     'idle_hours' => (int) env('ACME_CART_ABANDON_HOURS', 24),
 
-    // Only flag carts with at least this many items (filters out empty
-    // ones — those don't need rescuing).
-    'min_items' => 1,
-
-    // Hard ceiling per tick run, protects against thundering-herd
-    // notifications on the first run.
+    'min_items'   => 1,
     'batch_limit' => (int) env('ACME_CART_ABANDON_BATCH', 200),
 
-    // Recovery link TTL (hours). After this, the token still resolves
-    // but the controller refuses the restore.
+    // Recovery link TTL (hours). After this the controller refuses.
     'token_ttl_hours' => (int) env('ACME_CART_ABANDON_TTL', 72),
 
-    // Notification routing — what notifications.events.cart.abandoned
-    // resolves to if the host hasn't set it.
+    'route_prefix' => env('ACME_CART_ABANDON_PREFIX', 'cart'),
+
+    // Default channels for the `cart.abandoned` notification event.
     'default_channels' => ['mail'],
 
-    // Route prefix for the recovery link.
-    'route_prefix' => env('ACME_CART_ABANDON_PREFIX', 'cart'),
+    /*
+     * Multi-round reminders.
+     *
+     * Round 1 fires immediately on mark (hours_after_mark = 0).
+     * Each subsequent round fires when (now - abandoned_at) ≥
+     * hours_after_mark AND the previous round has been sent.
+     *
+     * Coupon (optional): when set, the tick generates a unique
+     * Coupon row from the template and includes the code in the body.
+     *
+     * Defaults: gentle nudge → 10% off → 15% off final-chance.
+     */
+    'rounds' => [
+        1 => [
+            'hours_after_mark' => 0,
+            'coupon' => null,
+        ],
+        2 => [
+            'hours_after_mark' => 48,
+            'coupon' => [
+                'prefix'       => 'COMEBACK_',
+                'type'         => 'percent',   // 'percent' | 'fixed'
+                'value'        => 10,
+                'min_subtotal' => null,
+                'ttl_hours'    => 14 * 24,
+            ],
+        ],
+        3 => [
+            'hours_after_mark' => 144,
+            'coupon' => [
+                'prefix'       => 'LASTCHANCE_',
+                'type'         => 'percent',
+                'value'        => 15,
+                'min_subtotal' => null,
+                'ttl_hours'    => 7 * 24,
+            ],
+        ],
+    ],
 ];

@@ -1,0 +1,48 @@
+{
+    "name": "acme/sku-bundles",
+    "description": "Bundle multiple SKUs into one sellable unit. Expands into cart lines linked by bundle_source_key; price delta auto-applied via CartAdjustmentProvider.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
+        { "type": "path", "url": "../media",     "options": { "symlink": true } },
+        { "type": "path", "url": "../cms-core",  "options": { "symlink": true } },
+        { "type": "path", "url": "../catalog",   "options": { "symlink": true } },
+        { "type": "path", "url": "../cart",      "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/cart": "*",
+        "acme/catalog": "*",
+        "acme/cms-core": "*",
+        "illuminate/database": "^12.0",
+        "illuminate/http": "^12.0",
+        "illuminate/routing": "^12.0",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": { "psr-4": { "Acme\\SkuBundles\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Acme\\SkuBundles\\Tests\\": "tests/" } },
+    "extra": {
+        "laravel": { "providers": ["Acme\\SkuBundles\\SkuBundlesServiceProvider"] },
+        "acme": {
+            "module": {
+                "key": "sku-bundles",
+                "title": "Acme SKU Bundles",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["cart", "catalog"]
+            }
+        }
+    }
+}
