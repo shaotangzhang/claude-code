@@ -3,6 +3,11 @@
     "description": "Foundation for all acme/* packages. Provides module manifest loader, installer, base ServiceProvider, baseline middleware and CLI.",
     "type": "library",
     "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } }
+    ],
     "require": {
         "php": "^8.3",
         "acme/contracts": "*",

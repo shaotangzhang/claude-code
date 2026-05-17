@@ -3,6 +3,10 @@
     "description": "Shared utilities, traits, casts and response helpers. Used by every acme/* package.",
     "type": "library",
     "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } }
+    ],
     "require": {
         "php": "^8.3",
         "acme/contracts": "*",
