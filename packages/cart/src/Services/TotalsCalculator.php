@@ -14,12 +14,15 @@ use Acme\Contracts\Commerce\TaxCalculator;
 /**
  * Computes and stores denormalized totals on a Cart row.
  *
- * Pipeline:
- *   subtotal = Σ line totals
- *   discount = Σ coupon discounts  +  Σ adjustments where target=discount
- *   tax      = TaxCalculator(taxable)
- *   shipping = ShippingCalculator(chosen option) + Σ adjustments where target=shipping
- *   total    = taxable + tax + shipping
+ * Pipeline (in order):
+ *   0. GiftSync::reconcile         (insert/remove gift lines from providers)
+ *   1. subtotal = Σ all line totals (gifts at unit price)
+ *   2. discount  = Σ coupon discounts
+ *                + Σ adjustment-provider discounts
+ *                + auto-discount of every gift line's value  ← so gifts net to 0
+ *   3. tax       = TaxCalculator(taxable)
+ *   4. shipping  = ShippingCalculator + provider shipping adj. + force-free flag
+ *   5. total     = taxable + tax + shipping
  *
  * Pure with respect to the persisted cart state at call time — caller
  * is responsible for invoking after mutating items / coupons / address.
@@ -30,22 +33,28 @@ final class TotalsCalculator
         private readonly TaxCalculator $tax,
         private readonly ShippingCalculator $shipping,
         private readonly AdjustmentRegistry $adjustments,
+        private readonly GiftSync $gifts,
     ) {}
 
     public function recalculate(Cart $cart, ?Address $destination = null, ?string $shippingOptionKey = null): Cart
     {
+        // 0. Reconcile gift lines first; refresh cart.items afterwards.
+        $this->gifts->reconcile($cart);
         $cart->loadMissing(['items', 'coupons']);
 
-        $subtotal = (int) $cart->items->sum('line_total_cents');
+        $subtotal      = (int) $cart->items->sum('line_total_cents');
+        $giftSubtotal  = (int) $cart->items->where('is_gift', true)->sum('line_total_cents');
 
-        // 1. Coupon discounts
-        $couponDiscount = 0;
+        // 1. Coupon discounts — based on NON-gift subtotal so coupons can't
+        //    accidentally "discount" the freebies further.
+        $payableSubtotal = $subtotal - $giftSubtotal;
+        $couponDiscount  = 0;
         foreach ($cart->coupons as $coupon) {
-            $couponDiscount += $this->discountFor($subtotal, $coupon->type, (int) $coupon->value, $cart->currency);
+            $couponDiscount += $this->discountFor($payableSubtotal, $coupon->type, (int) $coupon->value, $cart->currency);
         }
 
-        // 2. Provider adjustments (campaigns, loyalty redemption, member discount, ...)
-        $providerItems = $cart->items->map(fn ($i) => [
+        // 2. Provider adjustments (campaigns, loyalty redemption, member discount, ...).
+        $nonGiftItems = $cart->items->where('is_gift', false)->map(fn ($i) => [
             'sku_id'           => $i->sku_id,
             'quantity'         => $i->quantity,
             'unit_price_cents' => $i->unit_price_cents,
@@ -54,14 +63,13 @@ final class TotalsCalculator
             'attrs'            => $i->attrs_json ?? [],
         ])->values()->all();
 
-        $extraDiscount = 0;
-        $extraShipping = 0;
+        $extraDiscount     = 0;
+        $extraShipping     = 0;
         $forceFreeShipping = false;
         foreach ($this->adjustments->all() as $provider) {
-            foreach ($provider->adjustmentsFor($providerItems, $subtotal, $cart->currency, $cart->user_id) as $adj) {
+            foreach ($provider->adjustmentsFor($nonGiftItems, $payableSubtotal, $cart->currency, $cart->user_id) as $adj) {
                 /** @var CartAdjustment $adj */
                 if ($adj->target === CartAdjustment::TARGET_DISCOUNT) {
-                    // Discounts are stored as positive cents; providers send negative.
                     $extraDiscount += abs($adj->amountCents);
                 } elseif ($adj->target === CartAdjustment::TARGET_SHIPPING) {
                     $extraShipping += $adj->amountCents;
@@ -71,12 +79,15 @@ final class TotalsCalculator
             }
         }
 
-        $discount = min($couponDiscount + $extraDiscount, $subtotal);
+        // Auto-discount for every gift line — net effect of gifts on total = 0.
+        $autoGiftDiscount = $giftSubtotal;
+
+        $discount = min($couponDiscount + $extraDiscount + $autoGiftDiscount, $subtotal);
 
         $taxable  = $subtotal - $discount;
         $taxCents = $this->tax->calculate(max(0, $taxable), $cart->currency, $destination);
 
-        $shippingInput = $providerItems + ['__subtotal_cents' => $taxable];
+        $shippingInput = $nonGiftItems + ['__subtotal_cents' => $taxable];
         $shippingOptions = $this->shipping->options($shippingInput, $cart->currency, $destination);
         $shippingCents   = 0;
         if ($shippingOptions) {

@@ -1,0 +1,49 @@
+{
+    "name": "acme/notifications-webhook",
+    "description": "Webhook notification channel — POSTs the event payload to a configured URL with HMAC-SHA256 signature.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
+        { "type": "path", "url": "../media",     "options": { "symlink": true } },
+        { "type": "path", "url": "../cms-core",  "options": { "symlink": true } },
+        { "type": "path", "url": "../catalog",   "options": { "symlink": true } },
+        { "type": "path", "url": "../cart",      "options": { "symlink": true } },
+        { "type": "path", "url": "../membership","options": { "symlink": true } },
+        { "type": "path", "url": "../payments",  "options": { "symlink": true } },
+        { "type": "path", "url": "../checkout",  "options": { "symlink": true } },
+        { "type": "path", "url": "../commerce",  "options": { "symlink": true } },
+        { "type": "path", "url": "../blog",      "options": { "symlink": true } },
+        { "type": "path", "url": "../notifications", "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/notifications": "*",
+        "illuminate/http": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": { "psr-4": { "Acme\\NotificationsWebhook\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Acme\\NotificationsWebhook\\Tests\\": "tests/" } },
+    "extra": {
+        "laravel": { "providers": ["Acme\\NotificationsWebhook\\NotificationsWebhookServiceProvider"] },
+        "acme": {
+            "module": {
+                "key": "notifications-webhook",
+                "title": "Acme Notifications · Webhook",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["notifications"]
+            }
+        }
+    }
+}

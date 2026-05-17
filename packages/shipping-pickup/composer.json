@@ -1,9 +1,9 @@
 {
-    "name": "acme/cart",
-    "description": "Shopping cart: guest/user carts with merge-on-login, coupon engine, pluggable tax & shipping strategies, plus CartAdjustmentProvider extension point.",
+    "name": "acme/shipping-pickup",
+    "description": "In-store / warehouse pickup. Each location is a free 'pickup' option at checkout.",
     "type": "library",
     "license": "MIT",
-    "version": "0.5.0",
+    "version": "0.1.0",
     "repositories": [
         { "type": "path", "url": "../contracts", "options": { "symlink": true } },
         { "type": "path", "url": "../support",   "options": { "symlink": true } },
@@ -12,47 +12,31 @@
         { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
         { "type": "path", "url": "../media",     "options": { "symlink": true } },
         { "type": "path", "url": "../cms-core",  "options": { "symlink": true } },
-        { "type": "path", "url": "../catalog",   "options": { "symlink": true } }
+        { "type": "path", "url": "../catalog",   "options": { "symlink": true } },
+        { "type": "path", "url": "../cart",      "options": { "symlink": true } }
     ],
     "require": {
         "php": "^8.3",
         "acme/starter": "*",
-        "acme/auth": "*",
-        "acme/rbac": "*",
-        "acme/cms-core": "*",
-        "acme/catalog": "*",
+        "acme/cart": "*",
         "illuminate/database": "^12.0",
-        "illuminate/events": "^12.0",
-        "illuminate/http": "^12.0",
-        "illuminate/routing": "^12.0",
-        "illuminate/support": "^12.0",
-        "illuminate/view": "^12.0"
+        "illuminate/support": "^12.0"
     },
     "require-dev": {
         "orchestra/testbench": "^10.0",
         "phpunit/phpunit": "^11.0"
     },
-    "autoload": {
-        "psr-4": {
-            "Acme\\Cart\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Acme\\Cart\\Tests\\": "tests/"
-        }
-    },
+    "autoload": { "psr-4": { "Acme\\ShippingPickup\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Acme\\ShippingPickup\\Tests\\": "tests/" } },
     "extra": {
-        "laravel": {
-            "providers": ["Acme\\Cart\\CartServiceProvider"]
-        },
+        "laravel": { "providers": ["Acme\\ShippingPickup\\ShippingPickupServiceProvider"] },
         "acme": {
             "module": {
-                "key": "cart",
-                "title": "Acme Cart",
+                "key": "shipping-pickup",
+                "title": "Acme Shipping · Pickup",
                 "version": "0.1.0",
                 "layer": 3,
-                "depends": ["catalog"]
+                "depends": ["cart"]
             }
         }
     }

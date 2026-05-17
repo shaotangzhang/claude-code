@@ -99,6 +99,7 @@ final class CartService
     public function updateQuantity(CartItem $item, int $quantity): CartItem
     {
         $this->guardQuantity($quantity);
+        $this->guardNotGift($item);
 
         return DB::transaction(function () use ($item, $quantity): CartItem {
             if ($quantity === 0) {
@@ -123,6 +124,8 @@ final class CartService
 
     public function removeItem(CartItem $item): void
     {
+        $this->guardNotGift($item);
+
         DB::transaction(function () use ($item): void {
             $cartId = $item->cart_id;
             $item->delete();
@@ -142,6 +145,13 @@ final class CartService
         $max = (int) config('acme.cart.max_quantity_per_line', 999);
         if ($q < 0 || $q > $max) {
             throw new RuntimeException("Quantity must be between 0 and {$max}.");
+        }
+    }
+
+    private function guardNotGift(CartItem $item): void
+    {
+        if ($item->is_gift) {
+            throw new RuntimeException("Gift line {$item->id} cannot be mutated by the user; it is managed by the promotion that produced it.");
         }
     }
 }

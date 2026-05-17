@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Acme\Commerce;
 
 use Acme\Cart\Adjustments\AdjustmentRegistry;
+use Acme\Cart\Adjustments\GiftRegistry;
 use Acme\Checkout\Events\OrderCanceled;
 use Acme\Checkout\Events\OrderFulfilled;
 use Acme\Checkout\Events\OrderPaid;
+use Acme\Commerce\Campaigns\BxgyGiftProvider;
 use Acme\Commerce\Campaigns\CampaignProvider;
 use Acme\Commerce\Campaigns\Evaluators\BundleEvaluator;
 use Acme\Commerce\Campaigns\Evaluators\BxgyEvaluator;
@@ -59,6 +61,8 @@ final class CommerceServiceProvider extends PackageServiceProvider
 
             return new CampaignProvider($evaluators);
         });
+
+        $this->app->singleton(BxgyGiftProvider::class);
     }
 
     protected function packageBoot(): void
@@ -72,6 +76,11 @@ final class CommerceServiceProvider extends PackageServiceProvider
         // Hook into cart's adjustment registry so campaigns auto-apply on every recalc.
         $this->app->resolving(AdjustmentRegistry::class, function (AdjustmentRegistry $reg): void {
             $reg->register($this->app->make(CampaignProvider::class));
+        });
+
+        // Hook into cart's gift registry so 100%-off BxGy campaigns push gift lines.
+        $this->app->resolving(GiftRegistry::class, function (GiftRegistry $reg): void {
+            $reg->register($this->app->make(BxgyGiftProvider::class));
         });
     }
 }

@@ -18,6 +18,7 @@ class CartItem extends Model
     protected $fillable = [
         'cart_id', 'sku_id', 'quantity', 'unit_price_cents',
         'line_total_cents', 'currency', 'attrs_json',
+        'is_gift', 'gift_source_key',
     ];
 
     protected function casts(): array
@@ -27,6 +28,7 @@ class CartItem extends Model
             'quantity'          => 'integer',
             'unit_price_cents'  => 'integer',
             'line_total_cents'  => 'integer',
+            'is_gift'           => 'bool',
         ];
     }
 

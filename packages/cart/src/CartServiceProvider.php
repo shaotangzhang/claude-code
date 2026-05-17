@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Acme\Cart;
 
 use Acme\Cart\Adjustments\AdjustmentRegistry;
+use Acme\Cart\Adjustments\GiftRegistry;
 use Acme\Cart\Blocks\CartSummaryBlock;
 use Acme\Cart\Listeners\MergeOnLogin;
 use Acme\Cart\Services\CartMerger;
 use Acme\Cart\Services\CartService;
 use Acme\Cart\Services\CouponService;
+use Acme\Cart\Services\GiftSync;
 use Acme\Cart\Services\TotalsCalculator;
 use Acme\Cart\Pricing\DefaultPriceResolver;
 use Acme\Cart\Shipping\CompositeShippingCalculator;
@@ -53,6 +55,8 @@ final class CartServiceProvider extends PackageServiceProvider
         $this->app->singleton(ShippingCalculator::class, CompositeShippingCalculator::class);
 
         $this->app->singleton(AdjustmentRegistry::class);
+        $this->app->singleton(GiftRegistry::class);
+        $this->app->singleton(GiftSync::class);
         $this->app->singleton(TotalsCalculator::class);
         $this->app->singleton(CartService::class);
         $this->app->singleton(CouponService::class);
