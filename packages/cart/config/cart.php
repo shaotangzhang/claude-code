@@ -27,6 +27,11 @@ return [
         'label'              => env('ACME_CART_SHIPPING_LABEL', 'Standard shipping'),
         'days_min'           => 3,
         'days_max'           => 7,
+
+        // When true, the built-in flat option appears alongside any
+        // methods registered by acme/shipping-* packages. Disable to
+        // let installed methods own shipping options exclusively.
+        'builtin_flat_enabled' => env('ACME_CART_BUILTIN_SHIPPING', true),
     ],
 
     'max_quantity_per_line' => 999,

@@ -1,9 +1,9 @@
 {
-    "name": "acme/cart",
-    "description": "Shopping cart: guest/user carts with merge-on-login, coupon engine, pluggable tax & shipping strategies, plus CartAdjustmentProvider extension point.",
+    "name": "acme/notifications",
+    "description": "Listener-based notification dispatcher with channel abstraction. Default channels: mail, log; SMS / webhook live in sub-packages.",
     "type": "library",
     "license": "MIT",
-    "version": "0.3.0",
+    "version": "0.1.0",
     "repositories": [
         { "type": "path", "url": "../contracts", "options": { "symlink": true } },
         { "type": "path", "url": "../support",   "options": { "symlink": true } },
@@ -12,19 +12,24 @@
         { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
         { "type": "path", "url": "../media",     "options": { "symlink": true } },
         { "type": "path", "url": "../cms-core",  "options": { "symlink": true } },
-        { "type": "path", "url": "../catalog",   "options": { "symlink": true } }
+        { "type": "path", "url": "../catalog",   "options": { "symlink": true } },
+        { "type": "path", "url": "../cart",      "options": { "symlink": true } },
+        { "type": "path", "url": "../membership","options": { "symlink": true } },
+        { "type": "path", "url": "../payments",  "options": { "symlink": true } },
+        { "type": "path", "url": "../checkout",  "options": { "symlink": true } },
+        { "type": "path", "url": "../commerce",  "options": { "symlink": true } },
+        { "type": "path", "url": "../blog",      "options": { "symlink": true } }
     ],
     "require": {
         "php": "^8.3",
         "acme/starter": "*",
         "acme/auth": "*",
-        "acme/rbac": "*",
-        "acme/cms-core": "*",
-        "acme/catalog": "*",
+        "acme/checkout": "*",
+        "acme/commerce": "*",
+        "acme/blog": "*",
         "illuminate/database": "^12.0",
         "illuminate/events": "^12.0",
-        "illuminate/http": "^12.0",
-        "illuminate/routing": "^12.0",
+        "illuminate/mail": "^12.0",
         "illuminate/support": "^12.0",
         "illuminate/view": "^12.0"
     },
@@ -34,25 +39,25 @@
     },
     "autoload": {
         "psr-4": {
-            "Acme\\Cart\\": "src/"
+            "Acme\\Notifications\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Acme\\Cart\\Tests\\": "tests/"
+            "Acme\\Notifications\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
-            "providers": ["Acme\\Cart\\CartServiceProvider"]
+            "providers": ["Acme\\Notifications\\NotificationsServiceProvider"]
         },
         "acme": {
             "module": {
-                "key": "cart",
-                "title": "Acme Cart",
+                "key": "notifications",
+                "title": "Acme Notifications",
                 "version": "0.1.0",
                 "layer": 3,
-                "depends": ["catalog"]
+                "depends": ["checkout", "commerce", "blog"]
             }
         }
     }

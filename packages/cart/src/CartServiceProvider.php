@@ -11,7 +11,9 @@ use Acme\Cart\Services\CartMerger;
 use Acme\Cart\Services\CartService;
 use Acme\Cart\Services\CouponService;
 use Acme\Cart\Services\TotalsCalculator;
+use Acme\Cart\Shipping\CompositeShippingCalculator;
 use Acme\Cart\Shipping\FlatRateShipping;
+use Acme\Cart\Shipping\ShippingMethodRegistry;
 use Acme\Cart\Tax\FlatRateTax;
 use Acme\Contracts\Cms\BlockRegistry;
 use Acme\Contracts\Commerce\ShippingCalculator;
@@ -38,10 +40,14 @@ final class CartServiceProvider extends PackageServiceProvider
 
     protected function packageRegister(): void
     {
-        // Defaults — override by binding TaxCalculator/ShippingCalculator
-        // to your own implementation in the host ServiceProvider.
+        // Defaults — override by binding TaxCalculator to your own
+        // implementation in the host ServiceProvider. For shipping, install
+        // an acme/shipping-* package to register additional ShippingMethods.
         $this->app->singleton(TaxCalculator::class, FlatRateTax::class);
-        $this->app->singleton(ShippingCalculator::class, FlatRateShipping::class);
+
+        $this->app->singleton(FlatRateShipping::class);
+        $this->app->singleton(ShippingMethodRegistry::class);
+        $this->app->singleton(ShippingCalculator::class, CompositeShippingCalculator::class);
 
         $this->app->singleton(AdjustmentRegistry::class);
         $this->app->singleton(TotalsCalculator::class);

@@ -1,9 +1,9 @@
 {
-    "name": "acme/cart",
-    "description": "Shopping cart: guest/user carts with merge-on-login, coupon engine, pluggable tax & shipping strategies, plus CartAdjustmentProvider extension point.",
+    "name": "acme/search",
+    "description": "Catalog search with facets. Pluggable driver (default: database LIKE); first-class hook for MeiliSearch / Elasticsearch replacement.",
     "type": "library",
     "license": "MIT",
-    "version": "0.3.0",
+    "version": "0.1.0",
     "repositories": [
         { "type": "path", "url": "../contracts", "options": { "symlink": true } },
         { "type": "path", "url": "../support",   "options": { "symlink": true } },
@@ -17,10 +17,9 @@
     "require": {
         "php": "^8.3",
         "acme/starter": "*",
-        "acme/auth": "*",
-        "acme/rbac": "*",
         "acme/cms-core": "*",
         "acme/catalog": "*",
+        "illuminate/console": "^12.0",
         "illuminate/database": "^12.0",
         "illuminate/events": "^12.0",
         "illuminate/http": "^12.0",
@@ -34,22 +33,22 @@
     },
     "autoload": {
         "psr-4": {
-            "Acme\\Cart\\": "src/"
+            "Acme\\Search\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Acme\\Cart\\Tests\\": "tests/"
+            "Acme\\Search\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
-            "providers": ["Acme\\Cart\\CartServiceProvider"]
+            "providers": ["Acme\\Search\\SearchServiceProvider"]
         },
         "acme": {
             "module": {
-                "key": "cart",
-                "title": "Acme Cart",
+                "key": "search",
+                "title": "Acme Search",
                 "version": "0.1.0",
                 "layer": 3,
                 "depends": ["catalog"]
