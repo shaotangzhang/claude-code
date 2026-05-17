@@ -140,6 +140,55 @@ packages/<name>/
 - 每个包维护 `CHANGELOG.md`（Keep a Changelog）。
 - Monorepo 用 `monorepo-builder release`；polyrepo 用 GitHub Actions tag-and-split。
 
+### 12.1 分支策略（与里程碑/包对应）
+
+为了"任何人随时可以从任意阶段 fork 并继续"，分支按 **里程碑 + 包** 一一映射：
+
+```
+main                                  # 永远是"最新可用整套"，受保护
+└─ plan/roadmap                       # 规划基线（本仓库当前所在分支）
+   ├─ pkg/m0-starter
+   ├─ pkg/m1-auth
+   │  ├─ pkg/m1-rbac
+   │  ├─ pkg/m1-admin
+   │  └─ pkg/m1-user-center
+   ├─ pkg/m2-cms-core
+   │  ├─ pkg/m2-media
+   │  ├─ pkg/m2-i18n
+   │  └─ pkg/m2-seo
+   ├─ pkg/m3-cms-admin
+   ├─ pkg/m4-blog
+   ├─ pkg/m5-catalog
+   ├─ pkg/m6-membership
+   ├─ pkg/m7-cart
+   ├─ pkg/m8-checkout
+   │  └─ pkg/m8-payments-stripe
+   ├─ pkg/m9-commerce
+   ├─ pkg/m10-crm
+   ├─ pkg/m11-erp
+   ├─ pkg/m12-finance
+   └─ pkg/m13-lms
+```
+
+约定：
+
+- **命名**：`pkg/m<N>-<package-kebab>`，N 与 [03-roadmap.md](03-roadmap.md) 的里程碑编号一致。
+- **来源**：每个 `pkg/m<N>-*` 分支创建时基于其**直接上游包**所在分支（已合入 `main` 之后从 `main` 切）。
+  - 例：`pkg/m4-blog` 从 `main`（此时 `main` 已含 `m2-cms-core`）切出。
+- **保护分支**：`main`、`plan/*` 禁直推，只接受 PR + Review + CI 通过。
+- **合并节奏**：每个 `pkg/m<N>-*` 完成后通过 PR 合入 `main`，**不在分支间互相合并**（避免依赖反转）。
+- **打 tag**：合入后立即在 `main` 上打 `v-<pkg>-<semver>`，例如 `v-cms-core-1.0.0`、`v-blog-0.1.0`。tag 与包名绑定，便于 `composer require acme/blog:1.0.0` 锁版本。
+- **保留长寿命分支**：所有 `pkg/m<N>-*` 分支**合并后保留**（不删除），作为 fork 起点。任何人想"只要前 5 个模块"，`git checkout pkg/m4-blog` 就够了。
+- **hotfix 分支**：`hotfix/<pkg>-<issue>`，从对应 tag 切出，修完合回 `main` 并 cherry-pick 到仍存活的 `pkg/m*`。
+- **客户项目分支**：`client/<name>`，从 `main` 的某个 tag 集合切出，**永不**回流上游（沉淀模式见 [05-extension-model.md](05-extension-model.md) §4）。
+- **CI 强制**：流水线检查 `pkg/m<N>-*` 分支的 `composer.json` 不得 `require` 大于 N 的上游包，防止依赖倒挂。
+
+### 12.2 提交粒度
+
+- 一个里程碑一组提交、一个 PR、一个 tag。
+- PR 标题：`[m<N>] <pkg>: <action>`，例：`[m2] cms-core: rendering pipeline + slot registry`。
+- 合入 commit 用 squash，保留 PR 描述作为 changelog 草稿来源。
+
 ## 13. 代码风格
 
 - PHP 8.3+，`declare(strict_types=1)`。
