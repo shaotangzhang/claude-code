@@ -1,9 +1,9 @@
 {
     "name": "acme/commerce",
-    "description": "Commerce plus: multi-warehouse inventory, returns/RMA, reviews, campaigns, loyalty points.",
+    "description": "Commerce plus: multi-warehouse inventory, returns/RMA, reviews, auto-applied campaigns, loyalty points.",
     "type": "library",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "repositories": [
         { "type": "path", "url": "../contracts",  "options": { "symlink": true } },
         { "type": "path", "url": "../support",    "options": { "symlink": true } },

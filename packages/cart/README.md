@@ -1,6 +1,6 @@
-# acme/cart
+# acme/cart  (0.2)
 
-> 购物车：游客 / 登录态合并、优惠券、可插拔税费 / 运费策略。**结账由 checkout 包消费此包的状态**。
+> 购物车：游客 / 登录态合并、优惠券、可插拔税费 / 运费策略 / **可插拔调整提供者**（campaigns、积分抵扣、会员折扣...）。**结账由 checkout 包消费此包的状态**。
 
 ## 依赖
 - [acme/catalog](../catalog)（SKU 与价格）
@@ -29,14 +29,24 @@ active ── checkout 完成 ──→ converted
 
 ## 可插拔策略（核心扩展点）
 
-两个 contract，默认两个简单实现：
-
+### 税费 / 运费（替换式）
 | Contract | 默认实现 | 替换姿势 |
 | --- | --- | --- |
 | `Acme\Contracts\Commerce\TaxCalculator` | `FlatRateTax`（一刀切 basis points） | 在宿主 SP `bind(TaxCalculator::class, YourTax::class)` |
 | `Acme\Contracts\Commerce\ShippingCalculator` | `FlatRateShipping`（一刀切 + 阈值免运） | 同上 |
 
-任何"按目的地"、"按重量"、"按时段"的策略都是替换默认实现的事情，**不**需要碰本包代码。
+### Adjustments（追加式 —— 新增于 0.2）
+
+`Acme\Contracts\Commerce\CartAdjustmentProvider` —— 任何想"动 cart 总价"的功能（优惠活动、积分抵扣、会员折扣...）实现此接口并注册到 `AdjustmentRegistry`：
+
+```php
+// 在某个包的 ServiceProvider::packageBoot()
+$this->app->resolving(\Acme\Cart\Adjustments\AdjustmentRegistry::class, function ($r) {
+    $r->register($this->app->make(MyDiscountProvider::class));
+});
+```
+
+`TotalsCalculator` 重算时会逐个询问，把所有 provider 返回的 `discount`/`shipping` 调整一并累加。**追加式**意味着多个 provider 可同时生效（campaigns + 积分 + 会员折扣可同时叠加）。任何"按目的地"、"按重量"、"按时段"的策略都是替换默认实现的事情，**不**需要碰本包代码。
 
 ## 优惠券
 

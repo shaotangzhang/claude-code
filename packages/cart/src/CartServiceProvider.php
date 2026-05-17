@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Acme\Cart;
 
+use Acme\Cart\Adjustments\AdjustmentRegistry;
 use Acme\Cart\Blocks\CartSummaryBlock;
 use Acme\Cart\Listeners\MergeOnLogin;
 use Acme\Cart\Services\CartMerger;
@@ -42,6 +43,7 @@ final class CartServiceProvider extends PackageServiceProvider
         $this->app->singleton(TaxCalculator::class, FlatRateTax::class);
         $this->app->singleton(ShippingCalculator::class, FlatRateShipping::class);
 
+        $this->app->singleton(AdjustmentRegistry::class);
         $this->app->singleton(TotalsCalculator::class);
         $this->app->singleton(CartService::class);
         $this->app->singleton(CouponService::class);

@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Acme\Commerce;
 
+use Acme\Cart\Adjustments\AdjustmentRegistry;
 use Acme\Checkout\Events\OrderCanceled;
 use Acme\Checkout\Events\OrderFulfilled;
 use Acme\Checkout\Events\OrderPaid;
+use Acme\Commerce\Campaigns\CampaignProvider;
+use Acme\Commerce\Campaigns\Evaluators\BundleEvaluator;
+use Acme\Commerce\Campaigns\Evaluators\TimedDiscountEvaluator;
+use Acme\Commerce\Campaigns\RuleEvaluator;
 use Acme\Commerce\Listeners\HandleOrderCanceled;
 use Acme\Commerce\Listeners\HandleOrderFulfilled;
 use Acme\Commerce\Listeners\HandleOrderPaid;
@@ -38,6 +43,18 @@ final class CommerceServiceProvider extends PackageServiceProvider
         $this->app->singleton(LoyaltyService::class);
         $this->app->singleton(ReturnService::class);
         $this->app->singleton(ReviewService::class);
+
+        $this->app->tag([
+            BundleEvaluator::class,
+            TimedDiscountEvaluator::class,
+        ], 'acme.commerce.campaign_evaluators');
+
+        $this->app->singleton(CampaignProvider::class, function ($app) {
+            /** @var iterable<RuleEvaluator> $evaluators */
+            $evaluators = $app->tagged('acme.commerce.campaign_evaluators');
+
+            return new CampaignProvider($evaluators);
+        });
     }
 
     protected function packageBoot(): void
@@ -47,5 +64,10 @@ final class CommerceServiceProvider extends PackageServiceProvider
         $events->listen(OrderPaid::class,      [HandleOrderPaid::class,      'handle']);
         $events->listen(OrderFulfilled::class, [HandleOrderFulfilled::class, 'handle']);
         $events->listen(OrderCanceled::class,  [HandleOrderCanceled::class,  'handle']);
+
+        // Hook into cart's adjustment registry so campaigns auto-apply on every recalc.
+        $this->app->resolving(AdjustmentRegistry::class, function (AdjustmentRegistry $reg): void {
+            $reg->register($this->app->make(CampaignProvider::class));
+        });
     }
 }

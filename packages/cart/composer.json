@@ -1,9 +1,9 @@
 {
     "name": "acme/cart",
-    "description": "Shopping cart: guest/user carts with merge-on-login, coupon engine, pluggable tax & shipping strategies.",
+    "description": "Shopping cart: guest/user carts with merge-on-login, coupon engine, pluggable tax & shipping strategies, plus CartAdjustmentProvider extension point.",
     "type": "library",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "repositories": [
         { "type": "path", "url": "../contracts", "options": { "symlink": true } },
         { "type": "path", "url": "../support",   "options": { "symlink": true } },
