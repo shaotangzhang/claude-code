@@ -1,0 +1,50 @@
+{
+    "name": "acme/payments-stripe",
+    "description": "Stripe gateway implementation for acme/payments. Uses Stripe REST API directly via Laravel HTTP client — no stripe-php dependency.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts",  "options": { "symlink": true } },
+        { "type": "path", "url": "../support",    "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",    "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",       "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",       "options": { "symlink": true } },
+        { "type": "path", "url": "../payments",   "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/payments": "*",
+        "illuminate/http": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\PaymentsStripe\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\PaymentsStripe\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": ["Acme\\PaymentsStripe\\StripeServiceProvider"]
+        },
+        "acme": {
+            "module": {
+                "key": "payments-stripe",
+                "title": "Acme Payments · Stripe",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["payments"]
+            }
+        }
+    }
+}
