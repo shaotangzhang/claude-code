@@ -17,7 +17,7 @@ use Throwable;
  *
  * Every attempt writes a row to `acme_notifications_log` — successful or not.
  */
-final class Dispatcher
+class Dispatcher
 {
     public function __construct(private readonly ChannelRegistry $channels) {}
 
