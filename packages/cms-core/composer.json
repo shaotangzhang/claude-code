@@ -1,0 +1,55 @@
+{
+    "name": "acme/cms-core",
+    "description": "CMS core: theme, layout, page, slot, block, widget — rendering pipeline + registries.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/contracts": "*",
+        "acme/support": "*",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "acme/rbac": "*",
+        "illuminate/database": "^12.0",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\CmsCore\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\CmsCore\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Acme\\CmsCore\\CmsCoreServiceProvider"
+            ]
+        },
+        "acme": {
+            "module": {
+                "key": "cms-core",
+                "title": "Acme CMS Core",
+                "version": "0.1.0",
+                "layer": 2,
+                "depends": ["rbac"]
+            }
+        }
+    }
+}

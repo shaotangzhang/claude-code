@@ -3,7 +3,7 @@
     "description": "Shared interfaces and DTOs used across all acme/* packages. No implementation, no downstream dependencies.",
     "type": "library",
     "license": "MIT",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "require": {
         "php": "^8.3"
     },

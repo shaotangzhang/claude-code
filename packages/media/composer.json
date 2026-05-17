@@ -1,0 +1,41 @@
+{
+    "name": "acme/media",
+    "description": "Media library: file uploads, polymorphic attachments, transcoding hooks.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "acme/rbac": "*",
+        "illuminate/database": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Media\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": ["Acme\\Media\\MediaServiceProvider"]
+        },
+        "acme": {
+            "module": {
+                "key": "media",
+                "title": "Acme Media",
+                "version": "0.1.0",
+                "layer": 2,
+                "depends": ["rbac"]
+            }
+        }
+    }
+}
