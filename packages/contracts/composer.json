@@ -1,0 +1,25 @@
+{
+    "name": "acme/contracts",
+    "description": "Shared interfaces and DTOs used across all acme/* packages. No implementation, no downstream dependencies.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Contracts\\": "src/"
+        }
+    },
+    "extra": {
+        "acme": {
+            "module": {
+                "key": "contracts",
+                "title": "Acme Contracts",
+                "version": "0.1.0",
+                "layer": 0,
+                "depends": []
+            }
+        }
+    }
+}

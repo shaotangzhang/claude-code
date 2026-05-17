@@ -1,0 +1,28 @@
+{
+    "name": "acme/support",
+    "description": "Shared utilities, traits, casts and response helpers. Used by every acme/* package.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "acme/contracts": "*",
+        "illuminate/database": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Support\\": "src/"
+        }
+    },
+    "extra": {
+        "acme": {
+            "module": {
+                "key": "support",
+                "title": "Acme Support",
+                "version": "0.1.0",
+                "layer": 0,
+                "depends": ["contracts"]
+            }
+        }
+    }
+}

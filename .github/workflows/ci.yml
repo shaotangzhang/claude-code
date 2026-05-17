@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "plan/**", "pkg/**", "hotfix/**", "claude/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-starter:
+    name: starter (php ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.3", "8.4"]
+    defaults:
+      run:
+        working-directory: packages/starter
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run tests
+        run: vendor/bin/phpunit --colors=always
+
+  dep-direction:
+    name: dependency-direction check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify no upstream package requires a downstream layer
+        run: |
+          python3 - <<'PY'
+          import json, glob, sys
+          layers = {}
+          deps   = {}
+          for f in glob.glob('packages/*/composer.json'):
+              data = json.load(open(f))
+              mod  = data.get('extra', {}).get('acme', {}).get('module')
+              if not mod: continue
+              key = mod['key']
+              layers[key] = mod.get('layer', 99)
+              deps[key]   = mod.get('depends', [])
+          bad = []
+          for pkg, ds in deps.items():
+              for d in ds:
+                  if d in layers and layers[d] > layers[pkg]:
+                      bad.append(f"{pkg}(layer {layers[pkg]}) depends on {d}(layer {layers[d]})")
+          if bad:
+              print("Dependency direction violations:")
+              for b in bad: print(" -", b)
+              sys.exit(1)
+          print("OK — all", len(deps), "modules respect layering.")
+          PY

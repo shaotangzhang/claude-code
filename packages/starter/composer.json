@@ -1,0 +1,43 @@
+{
+    "name": "acme/starter",
+    "description": "Foundation for all acme/* packages. Provides module manifest loader, installer, base ServiceProvider, baseline middleware and CLI.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "acme/contracts": "*",
+        "acme/support": "*",
+        "illuminate/console": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Acme\\Starter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Acme\\Starter\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Acme\\Starter\\StarterServiceProvider"
+            ]
+        },
+        "acme": {
+            "module": {
+                "key": "starter",
+                "title": "Acme Starter",
+                "version": "0.1.0",
+                "layer": 0,
+                "depends": ["contracts", "support"]
+            }
+        }
+    }
+}
