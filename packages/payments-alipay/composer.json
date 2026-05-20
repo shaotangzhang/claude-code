@@ -1,0 +1,41 @@
+{
+    "name": "acme/payments-alipay",
+    "description": "Alipay Open Platform gateway implementation for acme/payments. RSA2-signed REST API, no alipay-sdk-php dependency.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
+        { "type": "path", "url": "../payments",  "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "ext-openssl": "*",
+        "acme/starter": "*",
+        "acme/payments": "*",
+        "illuminate/http": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": { "psr-4": { "Acme\\PaymentsAlipay\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Acme\\PaymentsAlipay\\Tests\\": "tests/" } },
+    "extra": {
+        "laravel": { "providers": ["Acme\\PaymentsAlipay\\AlipayServiceProvider"] },
+        "acme": {
+            "module": {
+                "key": "payments-alipay",
+                "title": "Acme Payments · Alipay",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["payments"]
+            }
+        }
+    }
+}

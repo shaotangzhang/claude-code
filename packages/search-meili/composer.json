@@ -1,0 +1,43 @@
+{
+    "name": "acme/search-meili",
+    "description": "MeiliSearch driver for acme/search. Replaces DatabaseDriver via container binding; subscribes to product saved/deleted to keep the index fresh.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts", "options": { "symlink": true } },
+        { "type": "path", "url": "../support",   "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",   "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",      "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",      "options": { "symlink": true } },
+        { "type": "path", "url": "../media",     "options": { "symlink": true } },
+        { "type": "path", "url": "../cms-core",  "options": { "symlink": true } },
+        { "type": "path", "url": "../catalog",   "options": { "symlink": true } },
+        { "type": "path", "url": "../search",    "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/search": "*",
+        "illuminate/http": "^12.0",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": { "psr-4": { "Acme\\SearchMeili\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Acme\\SearchMeili\\Tests\\": "tests/" } },
+    "extra": {
+        "laravel": { "providers": ["Acme\\SearchMeili\\SearchMeiliServiceProvider"] },
+        "acme": {
+            "module": {
+                "key": "search-meili",
+                "title": "Acme Search · MeiliSearch",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["search"]
+            }
+        }
+    }
+}
