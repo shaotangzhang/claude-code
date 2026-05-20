@@ -29,11 +29,27 @@ final class WebhookController extends Controller
             $request->headers->all(),
         );
 
-        $tx = Transaction::query()->findOrFail($parsed['transaction_id']);
+        // Most webhooks identify by transaction_id we stamped in metadata.
+        // Refund / dispute webhooks may only quote the gateway's payment-intent
+        // id; parseWebhook returns it under raw.lookup_by_reference so we can
+        // locate the original transaction.
+        $tx = ! empty($parsed['transaction_id'])
+            ? Transaction::query()->find($parsed['transaction_id'])
+            : null;
+        if (! $tx && ! empty($parsed['raw']['lookup_by_reference'])) {
+            $tx = Transaction::query()
+                ->where('gateway', $gateway)
+                ->where('gateway_reference', $parsed['raw']['lookup_by_reference'])
+                ->first();
+        }
+        if (! $tx) {
+            throw new NotFoundHttpException('Webhook target transaction not found.');
+        }
 
         match ($parsed['status']) {
             'succeeded' => $svc->markSucceeded($tx),
             'failed'    => $svc->markFailed($tx, (string) ($parsed['raw']['reason'] ?? 'failed')),
+            'refunded'  => $svc->markRefunded($tx, (int) ($parsed['raw']['amount_cents'] ?? $tx->amount_cents)),
             default     => null,
         };
 

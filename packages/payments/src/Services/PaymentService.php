@@ -138,6 +138,20 @@ final class PaymentService
             throw new \RuntimeException("Refund did not succeed at gateway: {$tx->gateway}");
         }
 
+        return $this->markRefunded($tx, $amount);
+    }
+
+    /**
+     * Record a refund whose state of truth is the gateway's webhook —
+     * i.e. someone clicked "refund" in the Stripe dashboard and we
+     * learn about it second-hand. Idempotent on duplicate webhooks.
+     */
+    public function markRefunded(Transaction $tx, int $amountCents): Transaction
+    {
+        if ($tx->status === Transaction::STATUS_REFUNDED) {
+            return $tx;
+        }
+
         $tx->status      = Transaction::STATUS_REFUNDED;
         $tx->refunded_at = CarbonImmutable::now();
         $tx->save();
@@ -147,7 +161,7 @@ final class PaymentService
             gatewayKey:    $tx->gateway,
             relatedType:   $tx->related_type,
             relatedId:     $tx->related_id,
-            amountCents:   $amount,
+            amountCents:   $amountCents,
             currency:      $tx->currency,
         ));
 

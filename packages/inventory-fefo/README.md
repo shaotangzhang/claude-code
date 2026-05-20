@@ -1,6 +1,8 @@
-# acme/inventory-fefo
+# acme/inventory-fefo  (0.2)
 
 > First-Expired-First-Out 库存分配。食品 / 药品 / 化妆品 / 电池等带保质期品类必备。装上即替换 commerce 的默认 `StockAllocator`，整个订单管线自动按"最快过期先发"分配。
+>
+> **0.2 新增**：跨仓库 FEFO 调拨 + 临近过期 SKU 自动生成 timed_discount campaign。
 
 ## 依赖
 - [acme/commerce](../commerce)
@@ -38,13 +40,28 @@ OrderCanceled  → batch.reserved -= alloc.qty  (release, on_hand intact)
 
 ## 命令
 
-```
+```bash
+# 入库（已有）
 php artisan acme:inventory-fefo:receive <sku_id> <warehouse_id> <qty> <yyyy-mm-dd> \
             [--lot=BATCH-001] [--supplier=SUP-A]
 
-php artisan acme:inventory-fefo:expiring --days=30                # 报告近 30 天到期
-php artisan acme:inventory-fefo:expiring --include-expired         # 含已过期
+# 近期到期报告（已有）
+php artisan acme:inventory-fefo:expiring --days=30
+php artisan acme:inventory-fefo:expiring --include-expired
+
+# 0.2 新增：跨仓库调拨（FEFO 顺序）
+php artisan acme:inventory-fefo:transfer <sku> <from-wh> <to-wh> <qty> [--reason=...]
+
+# 0.2 新增：临近过期自动建 timed_discount campaign（建议 cron 每天跑一次）
+php artisan acme:inventory-fefo:auto-discount --days=14 --percent=20
+php artisan acme:inventory-fefo:auto-discount --dry-run
 ```
+
+### Transfer 算法
+按 source 仓 FEFO 顺序遍历 batches，每批切走 `min(remaining, available)`，在 dest 仓 find-or-create 同 `(sku, lot, expiry)` 的 batch 累加。`reserved` 不迁移（避免与已有订单冲突）。
+
+### Auto-discount 算法
+查每个 `expiry_date in [today, today+days]` 的非空 batch，按 `(sku, expiry_date)` 去重，为每对生成一个 `Campaign::TYPE_TIMED_DISCOUNT`（key = `near-expiry:<sku>:<date>` 保证幂等），rules_json `{scope: 'sku', sku_ids: [...], percent: N}`，`ends_at = expiry_date`。这条 campaign 立刻被 commerce 的 CampaignProvider 拾取，结账折扣自动生效。
 
 ## 与 commerce 的关系
 

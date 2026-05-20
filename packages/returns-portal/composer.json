@@ -1,0 +1,51 @@
+{
+    "name": "acme/returns-portal",
+    "description": "User-facing RMA self-service portal. Lists orders eligible for return, captures requests, displays status. Consumes commerce/ReturnService.",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "repositories": [
+        { "type": "path", "url": "../contracts",   "options": { "symlink": true } },
+        { "type": "path", "url": "../support",     "options": { "symlink": true } },
+        { "type": "path", "url": "../starter",     "options": { "symlink": true } },
+        { "type": "path", "url": "../auth",        "options": { "symlink": true } },
+        { "type": "path", "url": "../rbac",        "options": { "symlink": true } },
+        { "type": "path", "url": "../media",       "options": { "symlink": true } },
+        { "type": "path", "url": "../cms-core",    "options": { "symlink": true } },
+        { "type": "path", "url": "../catalog",     "options": { "symlink": true } },
+        { "type": "path", "url": "../cart",        "options": { "symlink": true } },
+        { "type": "path", "url": "../membership",  "options": { "symlink": true } },
+        { "type": "path", "url": "../payments",    "options": { "symlink": true } },
+        { "type": "path", "url": "../checkout",    "options": { "symlink": true } },
+        { "type": "path", "url": "../commerce",    "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": "^8.3",
+        "acme/starter": "*",
+        "acme/auth": "*",
+        "acme/checkout": "*",
+        "acme/commerce": "*",
+        "illuminate/http": "^12.0",
+        "illuminate/routing": "^12.0",
+        "illuminate/support": "^12.0",
+        "illuminate/view": "^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": { "psr-4": { "Acme\\ReturnsPortal\\": "src/" } },
+    "autoload-dev": { "psr-4": { "Acme\\ReturnsPortal\\Tests\\": "tests/" } },
+    "extra": {
+        "laravel": { "providers": ["Acme\\ReturnsPortal\\ReturnsPortalServiceProvider"] },
+        "acme": {
+            "module": {
+                "key": "returns-portal",
+                "title": "Acme Returns · User portal",
+                "version": "0.1.0",
+                "layer": 3,
+                "depends": ["commerce", "checkout"]
+            }
+        }
+    }
+}

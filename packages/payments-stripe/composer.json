@@ -3,7 +3,7 @@
     "description": "Stripe gateway implementation for acme/payments. Uses Stripe REST API directly via Laravel HTTP client — no stripe-php dependency.",
     "type": "library",
     "license": "MIT",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "repositories": [
         { "type": "path", "url": "../contracts",  "options": { "symlink": true } },
         { "type": "path", "url": "../support",    "options": { "symlink": true } },

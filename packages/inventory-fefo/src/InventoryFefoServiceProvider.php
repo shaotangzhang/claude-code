@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Acme\InventoryFefo;
 
 use Acme\Contracts\Commerce\StockAllocator;
+use Acme\InventoryFefo\Console\AutoDiscountCommand;
 use Acme\InventoryFefo\Console\ExpiringCommand;
 use Acme\InventoryFefo\Console\ReceiveCommand;
+use Acme\InventoryFefo\Console\TransferCommand;
 use Acme\Starter\Support\PackageServiceProvider;
 
 final class InventoryFefoServiceProvider extends PackageServiceProvider
@@ -34,6 +36,8 @@ final class InventoryFefoServiceProvider extends PackageServiceProvider
             $this->commands([
                 ReceiveCommand::class,
                 ExpiringCommand::class,
+                TransferCommand::class,
+                AutoDiscountCommand::class,
             ]);
         }
     }
