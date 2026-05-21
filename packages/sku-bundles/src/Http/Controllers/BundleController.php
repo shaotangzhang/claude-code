@@ -10,9 +10,9 @@ use Acme\SkuBundles\Models\Bundle;
 use Acme\SkuBundles\Services\BundleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Illuminate\Routing\Controllers\HasMiddleware;
 
-final class BundleController extends Controller
+final class BundleController implements HasMiddleware
 {
     public function add(Request $request, BundleService $svc, Cart $cart): RedirectResponse
     {
