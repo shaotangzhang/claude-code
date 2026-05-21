@@ -11,6 +11,8 @@ final class MultiCurrencyPricingServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'multi-currency-pricing';
 
+    protected bool $hasConfig = false;
+
     public function __construct($app)
     {
         parent::__construct($app);

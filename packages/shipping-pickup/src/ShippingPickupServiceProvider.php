@@ -11,6 +11,8 @@ final class ShippingPickupServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'shipping-pickup';
 
+    protected bool $hasConfig = false;
+
     public function __construct($app)
     {
         parent::__construct($app);

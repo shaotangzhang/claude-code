@@ -15,6 +15,8 @@ final class InventoryFefoServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'inventory-fefo';
 
+    protected bool $hasConfig = false;
+
     public function __construct($app)
     {
         parent::__construct($app);

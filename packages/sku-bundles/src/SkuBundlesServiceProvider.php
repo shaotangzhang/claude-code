@@ -13,6 +13,8 @@ final class SkuBundlesServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'sku-bundles';
 
+    protected bool $hasConfig = false;
+
     protected bool $hasViews        = true;
     protected bool $hasRoutesWeb    = true;
     protected bool $hasRoutesAdmin  = true;

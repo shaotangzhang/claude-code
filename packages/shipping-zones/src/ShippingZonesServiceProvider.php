@@ -11,6 +11,8 @@ final class ShippingZonesServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'shipping-zones';
 
+    protected bool $hasConfig = false;
+
     public function __construct($app)
     {
         parent::__construct($app);

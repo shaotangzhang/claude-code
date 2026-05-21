@@ -16,6 +16,8 @@ final class LoyaltyRedemptionServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'loyalty-redemption';
 
+    protected bool $hasConfig = false;
+
     protected bool $hasMigrations = false;
     protected bool $hasRoutesWeb  = true;
 

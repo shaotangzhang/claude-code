@@ -10,6 +10,8 @@ final class ReturnsPortalServiceProvider extends PackageServiceProvider
 {
     protected string $key = 'returns-portal';
 
+    protected bool $hasConfig = false;
+
     protected bool $hasMigrations = false;
     protected bool $hasViews      = true;
     protected bool $hasRoutesWeb  = true;
