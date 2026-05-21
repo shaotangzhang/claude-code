@@ -73,11 +73,12 @@ class DatabaseSeeder extends Seeder
             ['price_cents' => 1999, 'currency' => 'USD', 'stock_label' => 'In stock', 'position' => 1],
         );
 
-        // 4. Warehouse + initial stock
+        // 4. Warehouse + initial stock — use the Eloquent model so the
+        //    HasUlid trait stamps an id; DB::table() bypasses model events.
         $wh = Warehouse::firstOrCreate(['code' => 'WH-MAIN'], ['name' => 'Main warehouse']);
-        DB::table('acme_commerce_stock_levels')->updateOrInsert(
+        \Acme\Commerce\Models\StockLevel::updateOrCreate(
             ['sku_id' => $sku->id, 'warehouse_id' => $wh->id],
-            ['on_hand' => 100, 'reserved' => 0, 'updated_at' => now(), 'created_at' => now()],
+            ['on_hand' => 100, 'reserved' => 0],
         );
 
         // 5. Membership tier + plan
