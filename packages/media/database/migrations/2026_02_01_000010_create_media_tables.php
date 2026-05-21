@@ -29,7 +29,7 @@ return new class extends Migration
             $table->ulid('attachable_id');
             $table->string('role')->default('default');
             $table->unsignedInteger('position')->default(0);
-            $table->primary(['file_id', 'attachable_type', 'attachable_id', 'role']);
+            $table->primary(['file_id', 'attachable_type', 'attachable_id', 'role'], 'media_att_pk');
             $table->index(['attachable_type', 'attachable_id']);
         });
     }

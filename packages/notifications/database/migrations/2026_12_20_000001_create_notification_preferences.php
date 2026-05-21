@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('channel');         // 'mail' | 'log' | 'sms' | ...
             $table->boolean('enabled')->default(true);
             $table->timestamps();
-            $table->primary(['user_id', 'event_type', 'channel']);
+            $table->primary(['user_id', 'event_type', 'channel'], 'notify_pref_pk');
         });
 
         Schema::create('acme_notifications_log', function (Blueprint $table): void {

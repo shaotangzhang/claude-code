@@ -61,7 +61,7 @@ return new class extends Migration
             $table->string('event_type'); // started | renewed | paused | resumed | canceled | expired | payment_due | payment_received
             $table->json('payload_json')->nullable();
             $table->timestamp('created_at')->useCurrent();
-            $table->index(['subscription_id', 'created_at']);
+            $table->index(['subscription_id', 'created_at'], 'mship_sub_evt_at_idx');
             $table->index('event_type');
         });
     }

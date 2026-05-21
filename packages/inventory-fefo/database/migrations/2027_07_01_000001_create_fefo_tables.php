@@ -37,7 +37,7 @@ return new class extends Migration
             $table->timestamp('reserved_at')->useCurrent();
             $table->timestamp('shipped_at')->nullable();
             $table->timestamp('released_at')->nullable();
-            $table->index(['reference_type', 'reference_id', 'state']);
+            $table->index(['reference_type', 'reference_id', 'state'], 'fefo_alloc_ref_state_idx');
             $table->index(['batch_id', 'state']);
         });
     }

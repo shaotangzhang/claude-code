@@ -42,7 +42,7 @@ return new class extends Migration
             $table->string('reason')->nullable();
             $table->foreignUlid('actor_id')->nullable()->constrained('acme_auth_users')->nullOnDelete();
             $table->timestamp('occurred_at');
-            $table->index(['sku_id', 'warehouse_id', 'occurred_at']);
+            $table->index(['sku_id', 'warehouse_id', 'occurred_at'], 'cm_mov_sku_wh_at_idx');
             $table->index(['reference_type', 'reference_id']);
         });
 
@@ -120,7 +120,7 @@ return new class extends Migration
             $table->string('reason')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->index(['account_id', 'created_at']);
-            $table->index(['reference_type', 'reference_id']);
+            $table->index(['reference_type', 'reference_id'], 'cm_loyal_tx_ref_idx');
         });
     }
 
