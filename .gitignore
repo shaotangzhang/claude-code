@@ -9,5 +9,6 @@ composer.lock
 .env
 .env.*
 !.env.example
-apps/demo/storage/
-apps/demo/bootstrap/cache/
+# apps/demo/storage/ and apps/demo/bootstrap/cache/ contain their own
+# .gitignore stubs that ignore all contents but keep the dir tracked,
+# so we don't blanket-exclude them here.

@@ -6,6 +6,7 @@
     "require": {
         "php": "^8.3",
         "laravel/framework": "^12.0",
+        "laravel/tinker": "^2.9",
         "acme/contracts": "*",
         "acme/support": "*",
         "acme/starter": "*",
@@ -32,8 +33,29 @@
         "acme/multi-currency-pricing": "*",
         "acme/shipping-zones": "*",
         "acme/shipping-weight": "*",
+        "acme/shipping-free": "*",
+        "acme/shipping-pickup": "*",
+        "acme/shipping-local-delivery": "*",
         "acme/payments-stripe": "*",
-        "acme/payments-paypal": "*"
+        "acme/payments-paypal": "*",
+        "acme/payments-alipay": "*",
+        "acme/payments-wechatpay": "*",
+        "acme/payments-stripe-subscriptions": "*",
+        "acme/notifications-sms": "*",
+        "acme/notifications-webhook": "*",
+        "acme/abandoned-cart": "*",
+        "acme/sku-bundles": "*",
+        "acme/inventory-fefo": "*",
+        "acme/search-meili": "*",
+        "acme/search-elastic": "*",
+        "acme/returns-portal": "*"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pint": "^1.18",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.0",
+        "phpunit/phpunit": "^11.0"
     },
     "repositories": [
         { "type": "path", "url": "../../packages/*", "options": { "symlink": true } }
@@ -41,13 +63,44 @@
     "autoload": {
         "psr-4": {
             "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "scripts": {
-        "smoke": "php artisan acme:modules"
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ],
+        "smoke":        "@php artisan acme:modules",
+        "fresh":        "@php artisan migrate:fresh --seed",
+        "tick-all": [
+            "@php artisan acme:membership:tick",
+            "@php artisan acme:abandoned-cart:tick"
+        ]
     },
     "config": {
-        "sort-packages": true
-    }
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
