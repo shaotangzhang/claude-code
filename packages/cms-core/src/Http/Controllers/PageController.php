@@ -15,7 +15,12 @@ final class PageController extends Controller
 {
     public function show(Request $request, PageRenderer $renderer, string $slug = ''): Response
     {
-        $slug   = $slug === '' ? '/' : '/' . trim($slug, '/');
+        // When mounted as a fallback route, no {slug} param is bound — derive
+        // it from the request path instead.
+        if ($slug === '') {
+            $slug = ltrim($request->path(), '/');
+        }
+        $slug   = $slug === '' || $slug === '/' ? '/' : '/' . trim($slug, '/');
         $locale = app()->getLocale();
 
         $page = Page::query()
